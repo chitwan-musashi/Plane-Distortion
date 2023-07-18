@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Load the image and convert it to grayscale
-img = cv2.imread(r"g:\AI Engineering\Co-ops\Chitwan Singh\Plane Distortion\Endface\outer_flange_part2_bottom_92.482_degree.jpg")
+img = cv2.imread(r"g:\AI Engineering\Co-ops\Chitwan Singh\Plane Distortion\Endface\outer_flange_part2_right_bottom_quadrant_87.819_degree.jpg")
 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -30,13 +30,9 @@ for contour in contours:
         if ellipse_area >= min_area_threshold and ellipse[1][0] >= 0 and ellipse[1][1] >= 0:
             cv2.ellipse(ellipse_img, ellipse, (0, 255, 0), 2)
 
-            # Calculate semi-major axis
-            semi_major_axis = max(ellipse[1][0] / 2, ellipse[1][1] / 2)
-            print("Semi-Major Axis:", semi_major_axis)
-
 # Display the image with detected ellipses
 cv2.imshow("Detected Ellipses", ellipse_img)
-cv2.imwrite("G:\AI Engineering\Co-ops\Chitwan Singh\Plane Distortion\Testing\\" + "elipses_found.jpg", ellipse_img)
+#cv2.imwrite("G:\AI Engineering\Co-ops\Chitwan Singh\Plane Distortion\Testing\\" + "elipses_found.jpg", ellipse_img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
@@ -90,6 +86,23 @@ lsd = cv2.createLineSegmentDetector()
 # Detect line segments in the image
 lines, _, _, _ = lsd.detect(gray)
 
+# Draw the detected lines on the original image
+line_img = img.copy()
+if lines is not None:
+    # Draw each line segment
+    for line in lines:
+        for x1, y1, x2, y2 in line:
+            pt1 = (int(x1), int(y1))
+            pt2 = (int(x2), int(y2))
+            cv2.line(line_img, pt1, pt2, (0, 0, 255), 2)
+
+# Display the image with detected lines
+cv2.imshow("Detected Lines", line_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+horizontal_lines = []
+vertical_lines = []
 # Calculate the angle of inclination for each line
 line_angles = []
 if lines is not None:
@@ -97,6 +110,18 @@ if lines is not None:
         for x1, y1, x2, y2 in line:
             angle = np.degrees(np.arctan2(y2 - y1, x2 - x1))
             line_angles.append(angle)
+            if angle < 0:
+                angle = 360 + angle
+            if 0 <= angle <= 45:
+                horizontal_lines.append(angle)
+            elif 45 < angle <= 135:
+                vertical_lines.append(angle)
+            elif 135 < angle <= 225:
+                horizontal_lines.append(angle)
+            elif 225 < angle <= 315:
+                vertical_lines.append(angle)
+            elif 315 < angle <= 360:
+                horizontal_lines.append(angle)
 
 # Check if ellipses were found
 if len(ellipse_angles) > 0:
@@ -116,12 +141,18 @@ else:
 if len(line_angles) > 0:
     # Calculate the average angle of inclination
     avg_angle = np.mean(line_angles)
+    avg_vertical_angle = np.mean(vertical_lines)
+    avg_horizontal_angle = np.mean(horizontal_lines)
 
     # Calculate the plane of inclination
     plane_angle = 90 + avg_angle
+    vertical_angle = 90 - avg_vertical_angle
+    horizontal_angle = 180 - avg_horizontal_angle
 
     print("Using lines:")
     print("The object is inclined at an angle of {:.2f} degrees with respect to the image plane".format(plane_angle))
+    print("The object is inclined at an angle of {:.2f} degrees with respect to the vertical axis".format(vertical_angle))
+    print("The object is inclined at an angle of {:.2f} degrees with respect to the horizontal axis".format(horizontal_angle))
     #print("Maximum line angle:", max(line_angles))
 else:
     print("No lines found.")
