@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Load the image and convert it to grayscale
-img = cv2.imread(r"g:\AI Engineering\Co-ops\Chitwan Singh\Plane Distortion\Endface\outer_flange_part2_bottom_92.482_degree.jpg")
+img = cv2.imread(r"c:\Users\chitwan.singh\Plane-Distortion\Endface\outer_flange_part2_bottom_92.479_degree.jpg")
 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -90,6 +90,24 @@ lsd = cv2.createLineSegmentDetector()
 # Detect line segments in the image
 lines, _, _, _ = lsd.detect(gray)
 
+# Set the minimum line length threshold
+min_line_length = 200  # Adjust this value as per your requirement
+
+# Draw the detected lines on the image
+line_img = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+if lines is not None:
+    for line in lines:
+        x1, y1, x2, y2 = np.int32(line[0])  # Convert line coordinates to integers
+        line_length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+        if line_length >= min_line_length:
+            cv2.line(line_img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+# Display the image with detected lines
+cv2.imshow("Detected Lines", line_img)
+cv2.imwrite("G:\AI Engineering\Co-ops\Chitwan Singh\Plane Distortion\Testing\\" + "lines_found.jpg", line_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
 # Calculate the angle of inclination for each line
 line_angles = []
 if lines is not None:
@@ -98,13 +116,15 @@ if lines is not None:
             angle = np.degrees(np.arctan2(y2 - y1, x2 - x1))
             line_angles.append(angle)
 
+
+
 # Check if ellipses were found
 if len(ellipse_angles) > 0:
     # Calculate the average angle of inclination
     avg_angle = np.mean(ellipse_angles)
 
     # Calculate the plane of inclination
-    plane_angle = (90 - avg_angle)/3
+    plane_angle = (90 - avg_angle)/5
 
     print("Using ellipses:")
     print("The object is inclined at an angle of {:.2f} degrees with respect to the image plane".format(plane_angle))
@@ -118,7 +138,7 @@ if len(line_angles) > 0:
     avg_angle = np.mean(line_angles)
 
     # Calculate the plane of inclination
-    plane_angle = 90 + avg_angle
+    plane_angle = 90 - avg_angle
 
     print("Using lines:")
     print("The object is inclined at an angle of {:.2f} degrees with respect to the image plane".format(plane_angle))
