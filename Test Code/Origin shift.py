@@ -6,10 +6,10 @@ import math
 #face = 'right'
 #face = 'left'
 #face = 'top'
-face = 'complete'
+face = 'bottom'
 
 # Load the image and convert it to grayscale
-img = cv2.imread(r'g:\AI Engineering\Co-ops\Chitwan Singh\Plane Distortion\Endface\End_face_complete_part1_91.5_degree.jpg')
+img = cv2.imread(r'g:\AI Engineering\Co-ops\Chitwan Singh\Plane Distortion\Endface\outer_flange_part2_bottom_92.479_degree.jpg')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 # Apply histogram equalization to enhance contrast
