@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import os
 
-images_folder = r'C:\Users\chitwan.singh\Plane-Distortion\Endface1'
+images_folder = r'C:\Users\chitwan.singh\Plane-Distortion\EndfaceFlange'
 
 # Filter out folders and select only image files
 image_files = [
